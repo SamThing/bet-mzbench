@@ -1,5 +1,10 @@
-import random
 import mzbench
+import random
+import urllib2
+import socket
+import socks
+import time
+from multiprocessing import Process
 
 def initial_state():
     pass
@@ -8,17 +13,16 @@ def initial_state():
 def metrics():
     return [
         [
-            ('print', 'counter'),
-            ('print_2', 'counter')
+            ('success_requests', 'counter'),
+            ('failed_requests', 'counter')
         ],
-        ('dummy', 'histogram')
+        ('request_time', 'histogram')
     ]
 
-
 def my_print(msg):
-    mzbench.notify(('print', 'counter'), 1)
-    mzbench.notify(('print_2', 'counter'), 2)
+    mzbench.notify(('success_requests', 'counter'), 1)
+    mzbench.notify(('failed_requests', 'counter'), 2)
 
     print "{0}".format(msg)
 
-mzbench.notify(('dummy', 'histogram'), random.uniform(0, 1000000000)/7)
+mzbench.notify(('request_time', 'histogram'), random.uniform(0, 1000000000)/7)
