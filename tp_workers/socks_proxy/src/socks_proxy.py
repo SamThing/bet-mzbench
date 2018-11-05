@@ -33,7 +33,7 @@ def processors(host):
         response.close()
     except Exception as error:
         mzbench.notify(('failed_requests', 'counter'), 1)
-        print "{0}".format(str(error))
+        print "failed: {0}".format(str(error))
 
 
 def socks_load(host, proxy):
