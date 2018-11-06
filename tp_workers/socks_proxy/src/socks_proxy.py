@@ -36,11 +36,17 @@ def processors(host):
         print "failed: {0}".format(str(error))
 
 
-def socks_load(host, proxy):
+def socks_load(host, proxy, qtd):
     #socks.set_default_proxy(socks.SOCKS5, "127.0.0.1")
     socks.set_default_proxy(socks.SOCKS5, proxy)
     socket.socket = socks.socksocket
 
-    processor = Process(target=processors, args=[host])
-    processor.start()
-    processor.join()
+    t = []
+    for i in range(0, qtd):
+        t.append(Process(target=processors, args=[host]))
+
+    for i in t:
+        i.start()
+
+    for i in t:
+        i.join()
