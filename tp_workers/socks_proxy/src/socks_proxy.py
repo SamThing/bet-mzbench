@@ -19,21 +19,21 @@ def metrics():
     ]
 
 def processors(host):
+    start_time = time.time()
     try:
-        start_time = time.time()
         response = urllib2.urlopen(host)
 
         if 200 is int(response.code):
             mzbench.notify(('success_requests', 'counter'), 1)
         else:
-            print "{0}".format(response.code)
+            print "Failed {0}".format(response.code)
             mzbench.notify(('failed_requests', 'counter'), 1)
 
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
         response.close()
     except Exception as error:
         mzbench.notify(('failed_requests', 'counter'), 1)
-        print "failed: {0}".format(str(error))
+        print "Timeout: {0}".format(str(error))
 
 
 def socks_load(host, proxy, qtd):
