@@ -36,17 +36,11 @@ def processors(host):
         print "Timeout: {0}".format(str(error))
 
 
-def socks_load(host, proxy, qtd):
+def socks_load(host, proxy):
     #socks.set_default_proxy(socks.SOCKS5, "127.0.0.1")
     socks.set_default_proxy(socks.SOCKS5, proxy)
     socket.socket = socks.socksocket
 
-    t = []
-    for i in range(0, qtd):
-        t.append(Process(target=processors, args=[host]))
-
-    for i in t:
-        i.start()
-
-    for i in t:
-        i.join()
+    process = Process(target=processors, args=[host])
+    process.start()
+    process.join()
