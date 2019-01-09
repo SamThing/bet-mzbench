@@ -19,27 +19,29 @@ def metrics():
     ]
 
 
-def processors(client):
-    start_time = time.time()
-
+def processors(host):
     try:
-        client.publish("pos/cwb","") #publish
+        start_time = time.time()
+        response = urllib2.urlopen(host)
 
-        mzbench.notify(('success_requests', 'counter'), 1)
-
-    except Exception as error:
-        print "{0}".format(str(error))
-        mzbench.notify(('failed_requests', 'counter'), 1)
+        if 200 is int(response.code):
+            mzbench.notify(('success_requests', 'counter'), 1)
+        else:
+            print "{0}".format(response.code)
+            mzbench.notify(('failed_requests', 'counter'), 1)
 
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
+        response.close()
+    except Exception as error:
+        mzbench.notify(('failed_requests', 'counter'), 1)
+        print "{0}".format(str(error))
 
 
-
-def nap_load(host):
-    #broker_address="iot.eclipse.org" #use external broker
+def nap_load(host, proxy):
     client = mqtt.Client("P1") #create new instance
-    client.connect(host) #connect to broker
+    client.connect("iot.eclipse.org") #connect to broker
+    client.publish("house/main-light","OFF")#publish
 
-    processor = Process(target=processors, args=[client])
+    processor = Process(target=processors, args=[host])
     processor.start()
     processor.join()
