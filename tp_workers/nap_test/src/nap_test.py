@@ -1,6 +1,7 @@
 import mzbench
 import urllib2
 import time
+import paho.mqtt.client as mqtt
 from multiprocessing import Process
 
 
@@ -18,26 +19,27 @@ def metrics():
     ]
 
 
-def processors(host):
-    try:
-        start_time = time.time()
-        response = urllib2.urlopen(host)
+def processors(client):
+    start_time = time.time()
 
-        if 200 is int(response.code):
-            mzbench.notify(('success_requests', 'counter'), 1)
-        else:
-            print "{0}".format(response.code)
-            mzbench.notify(('failed_requests', 'counter'), 1)
+    try:
+        client.publish("pos/cwb","") #publish
+
+        mzbench.notify(('success_requests', 'counter'), 1)
+
+    except Exception as error:
+        print "{0}".format(str(error))
+        mzbench.notify(('failed_requests', 'counter'), 1)
 
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
-        response.close()
-    except Exception as error:
-        mzbench.notify(('failed_requests', 'counter'), 1)
-        print "{0}".format(str(error))
 
 
-def nap_load(host, proxy):
-    #processor = Process(target=processors, args=[host])
-    #processor.start()
-    #processor.join()
-    pass
+
+def nap_load(host):
+    #broker_address="iot.eclipse.org" #use external broker
+    client = mqtt.Client("P1") #create new instance
+    client.connect(host) #connect to broker
+
+    processor = Process(target=processors, args=[client])
+    processor.start()
+    processor.join()
