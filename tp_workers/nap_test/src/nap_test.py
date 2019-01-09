@@ -37,6 +37,7 @@ def processors(host):
 
 
 def nap_load(host, proxy):
-    processor = Process(target=processors, args=[host])
-    processor.start()
-    processor.join()
+    #processor = Process(target=processors, args=[host])
+    #processor.start()
+    #processor.join()
+    pass
