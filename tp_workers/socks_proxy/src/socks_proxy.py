@@ -31,6 +31,7 @@ def nap_processors(host, user, password, topic):
         mzbench.notify(('success_requests', 'counter'), 1)
         
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
+        client.close()
     except Exception as error:
         mzbench.notify(('failed_requests', 'counter'), 1)
         print "Timeout: {0}".format(str(error))
