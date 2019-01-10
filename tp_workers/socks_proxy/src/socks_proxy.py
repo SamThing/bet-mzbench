@@ -19,6 +19,18 @@ def metrics():
         ('request_time', 'histogram')
     ]
 
+def nap_processors(client, topic):
+    start_time = time.time()
+    try:
+        client.publish(topic,"OFF")#publish
+        mzbench.notify(('success_requests', 'counter'), 1)
+        
+        mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
+    except Exception as error:
+        mzbench.notify(('failed_requests', 'counter'), 1)
+        print "Timeout: {0}".format(str(error))
+
+
 def socks_processors(host):
     start_time = time.time()
     try:
@@ -49,5 +61,9 @@ def socks_load(host, proxy):
 
 def nap_load(host):
     client = mqtt.Client("P1") #create new instance
-    client.connect("iot.eclipse.org") #connect to broker
-    client.publish("house/main-light","OFF")#publish
+    client.connect(host) #connect to broker
+    topic = "house/main-light"
+
+    process = Process(target=nap_processors, args=[client, topic])
+    process.start()
+    process.join()
