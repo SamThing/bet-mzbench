@@ -70,7 +70,7 @@ def socks_load(host, proxy):
 
 
 def nap_load(host, user, password, topic):
-    nap_processors(host, user, password, topic)
-    #process = Process(target=nap_processors, args=[host, user, password, topic])
-    #process.start()
-    #process.join()
+    #nap_processors(host, user, password, topic)
+    process = Process(target=nap_processors, args=[host, user, password, topic])
+    process.start()
+    process.join()
