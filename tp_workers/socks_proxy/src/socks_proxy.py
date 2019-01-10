@@ -19,10 +19,12 @@ def metrics():
         ('request_time', 'histogram')
     ]
 
-def nap_processors(host, topic):
+def nap_processors(host, user, password, topic):
     start_time = time.time()
     try:
         client = mqtt.Client("P1") #create new instance
+        client.username_pw_set(user, password)
+        
         client.connect(host) #connect to broker
 
         client.publish(topic,"OFF")#publish
@@ -62,7 +64,7 @@ def socks_load(host, proxy):
     process.join()
 
 
-def nap_load(host, topic):
-    process = Process(target=nap_processors, args=[host, topic])
+def nap_load(host, user, password, topic):
+    process = Process(target=nap_processors, args=[host, user, password, topic])
     process.start()
     process.join()
