@@ -59,10 +59,9 @@ def socks_load(host, proxy):
     process.join()
 
 
-def nap_load(host):
+def nap_load(host, topic):
     client = mqtt.Client("P1") #create new instance
     client.connect(host) #connect to broker
-    topic = "house/main-light"
 
     process = Process(target=nap_processors, args=[client, topic])
     process.start()
