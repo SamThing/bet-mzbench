@@ -19,9 +19,12 @@ def metrics():
         ('request_time', 'histogram')
     ]
 
-def nap_processors(client, topic):
+def nap_processors(host, topic):
     start_time = time.time()
     try:
+        client = mqtt.Client("P1") #create new instance
+        client.connect(host) #connect to broker
+
         client.publish(topic,"OFF")#publish
         mzbench.notify(('success_requests', 'counter'), 1)
         
@@ -60,9 +63,6 @@ def socks_load(host, proxy):
 
 
 def nap_load(host, topic):
-    client = mqtt.Client("P1") #create new instance
-    client.connect(host) #connect to broker
-
-    process = Process(target=nap_processors, args=[client, topic])
+    process = Process(target=nap_processors, args=[host, topic])
     process.start()
     process.join()
