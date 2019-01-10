@@ -3,7 +3,8 @@ import urllib2
 import socket
 import socks
 import time
-import paho.mqtt.client as mqtt
+#import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 from multiprocessing import Process
 
 def initial_state():
@@ -21,17 +22,20 @@ def metrics():
 
 def nap_processors(host, user, password, topic):
     start_time = time.time()
-    try:
-        client = mqtt.Client("P1") #create new instance
-        client.username_pw_set(user, password)
-        
-        client.connect(host) #connect to broker
 
-        client.publish(topic,"OFF")#publish
+    try:
+        #client = mqtt.Client("P1") #create new instance
+
+        #client.username_pw_set(user, password)
+        
+        #client.connect(host) #connect to broker
+
+        #client.publish(topic,"OFF")#publish
+
+        publish.single(topic, "payload", hostname=host, auth={'username': user, 'password': password})
         mzbench.notify(('success_requests', 'counter'), 1)
         
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
-        client.close()
     except Exception as error:
         mzbench.notify(('failed_requests', 'counter'), 1)
         print "Timeout: {0}".format(str(error))
