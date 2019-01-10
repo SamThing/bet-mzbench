@@ -3,7 +3,6 @@ import urllib2
 import socket
 import socks
 import time
-#import paho.mqtt.client as mqtt
 from multiprocessing import Process
 
 def initial_state():
@@ -19,7 +18,7 @@ def metrics():
         ('request_time', 'histogram')
     ]
 
-def socks_processors(host):
+def processors(host):
     start_time = time.time()
     try:
         response = urllib2.urlopen(host)
@@ -42,12 +41,6 @@ def socks_load(host, proxy):
     socks.set_default_proxy(socks.SOCKS5, proxy)
     socket.socket = socks.socksocket
 
-    process = Process(target=socks_processors, args=[host])
+    process = Process(target=processors, args=[host])
     process.start()
     process.join()
-
-
-#def nap_load(host):
-#    client = mqtt.Client("P1") #create new instance
-#    client.connect("iot.eclipse.org") #connect to broker
-#    client.publish("house/main-light","OFF")#publish

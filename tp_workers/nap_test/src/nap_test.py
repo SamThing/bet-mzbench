@@ -1,7 +1,7 @@
 import mzbench
 import urllib2
 import time
-#import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt
 from multiprocessing import Process
 
 
@@ -37,11 +37,7 @@ def processors(host):
         print "{0}".format(str(error))
 
 
-def nap_load(host, proxy):
-    #client = mqtt.Client("P1") #create new instance
-    #client.connect("iot.eclipse.org") #connect to broker
-    #client.publish("house/main-light","OFF")#publish
-
-    processor = Process(target=processors, args=[host])
-    processor.start()
-    processor.join()
+def nap_load(host):
+    client = mqtt.Client("P1") #create new instance
+    client.connect("iot.eclipse.org") #connect to broker
+    client.publish("house/main-light","OFF")#publish
