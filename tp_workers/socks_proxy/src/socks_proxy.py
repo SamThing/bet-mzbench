@@ -16,12 +16,12 @@ def get_random_id():
 def initial_state():
     pass
 
-
 def metrics():
     return [
         [
             ('success_requests', 'counter'),
-            ('failed_requests', 'counter')
+            ('failed_requests', 'counter'),
+            ('exception_requests', 'counter')
         ],
         ('request_time', 'histogram')
     ]
@@ -93,7 +93,7 @@ def rest_processors(host, headers):
 
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
     except Exception as error:
-        mzbench.notify(('failed_requests', 'counter'), 1)
+        mzbench.notify(('exception_requests', 'counter'), 1)
         print "Timeout: {0}".format(str(error))
 
 
