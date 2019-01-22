@@ -83,7 +83,7 @@ def rest_processors(host, headers):
     try:
         item = json.dumps(item, encoding='utf8')
 
-        r = requests.post(host, data=item, headers=headers, timeout=5)
+        r = requests.post(host, data=item, headers=headers, timeout=10)
 
         if r.status_code not in (200, 201):
             print "Failed {0}".format(r.status_code)
