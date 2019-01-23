@@ -133,7 +133,7 @@ def socks_load(host, proxy):
 
 
 def nap_load(host, user, password, topic, schema, example, field):
-    schema = avro.schema.parse(json.dumps(schema))
+    schema = avro.schema.parse(schema)
     writer = avro.io.DatumWriter(schema)
     bytes_writer = io.BytesIO()
 
