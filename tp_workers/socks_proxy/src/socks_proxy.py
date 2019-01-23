@@ -4,17 +4,24 @@ import socket
 import socks
 import time
 import requests
+import avro.schema
+import io
+import avro.io
 import json
 import numpy as np
 #import paho.mqtt.client as mqtt
 import paho.mqtt.publish as publish
 from multiprocessing import Process
+from avro.io import DatumWriter
+
 
 def get_random_id():
     return np.random.randint(2147483647, 9223372036854775807, size=1, dtype=np.int64)[0]
 
+
 def initial_state():
     pass
+
 
 def metrics():
     return [
@@ -26,16 +33,23 @@ def metrics():
         ('request_time', 'histogram')
     ]
 
-def nap_processors(host, user, password, topic):
+
+def nap_processors(host, user, password, topic, writer, bytes_writer, example, field):
+    example = json.loads(example)
+    example[field] = get_random_id()
     start_time = time.time()
 
+    encoder = avro.io.BinaryEncoder(bytes_writer)
+
+    writer.write(example, encoder)
+
     try:
-        publish.single(topic, "payload", hostname=host, auth={'username': user, 'password': password})
+        publish.single(topic, bytes_writer.getvalue(), hostname=host, auth={'username': user, 'password': password})
         mzbench.notify(('success_requests', 'counter'), 1)
         
         mzbench.notify(('request_time', 'histogram'), (time.time() - start_time))
     except Exception as error:
-        mzbench.notify(('failed_requests', 'counter'), 1)
+        mzbench.notify(('exception_requests', 'counter'), 1)
         print "Timeout: {0}".format(str(error))
 
 
@@ -118,8 +132,12 @@ def socks_load(host, proxy):
     process.join()
 
 
-def nap_load(host, user, password, topic):
+def nap_load(host, user, password, topic, schema, example, field):
+    schema = avro.schema.parse(json.dumps(schema))
+    writer = avro.io.DatumWriter(schema)
+    bytes_writer = io.BytesIO()
+
     #nap_processors(host, user, password, topic)
-    process = Process(target=nap_processors, args=[host, user, password, topic])
+    process = Process(target=nap_processors, args=[host, user, password, topic, writer, bytes_writer, example, field])
     process.start()
     process.join()
