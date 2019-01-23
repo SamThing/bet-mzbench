@@ -71,33 +71,24 @@ def socks_processors(host):
         print "Timeout: {0}".format(str(error))
 
 
-def rest_processors(host, headers):
-    start_time = time.time()
-    item = { #UPDATE ANTIGO
-          "antenna": get_random_id(),
-          "manufacturer": "SAMSUNG",
-          "model": "J7MOCK",
-          "product": "SMART",
-          "device": "J7MOCK",
-          "hardware": "LALALA",
-          "brand": "SAMSUNG",
-          "display": "DUNO",
-          "host": "DUNO",
-          "board": "GREAT",
-          "sdk_version": "1.2.8-fake",
-          "android_sdk_version": 19
-    }
-
-    item = { #UPDATE NOVO
-        "id": get_random_id(),
-        "tpsdk": "10.0.1",
-        "asdk": 24
-    }
-
+def rest_processors(host, headers, method, example, field):
     try:
-        item = json.dumps(item, encoding='utf8')
+        example = json.loads(example)
+        example[field] = get_random_id()
 
-        r = requests.post(host, data=item, headers=headers, timeout=10)
+        item = json.dumps(example, encoding='utf8')
+
+        start_time = time.time()
+        if method is 'PUT':
+            r = requests.put(host, data=item, headers=headers, timeout=10)
+        else:
+            if method is 'POST':
+                r = requests.post(host, data=item, headers=headers, timeout=10)
+            else:
+                if method is 'GET':
+                    r = requests.get(host, headers=headers, timeout=10)
+                else:
+                    print "Method {0} unknow".format(method)        
 
         if r.status_code not in (200, 201):
             print "Failed {0}".format(r.status_code)
@@ -111,13 +102,13 @@ def rest_processors(host, headers):
         print "Timeout: {0}".format(str(error))
 
 
-def rest_load(host, authorization_token):
+def rest_load(host, method, example, field, authorization_token):
     headers = { 
         'Content-Type': 'application/json',
         'x-api-key': authorization_token
     }
     
-    process = Process(target=rest_processors, args=[host, headers])
+    process = Process(target=rest_processors, args=[host, headers, method, example, field])
     process.start()
     process.join()
 
