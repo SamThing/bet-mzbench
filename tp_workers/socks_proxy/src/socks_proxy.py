@@ -35,15 +35,15 @@ def metrics():
 
 
 def nap_processors(host, user, password, topic, writer, bytes_writer, example, field):
-    example = json.loads(example)
-    example[field] = get_random_id()
-    start_time = time.time()
-
-    encoder = avro.io.BinaryEncoder(bytes_writer)
-
-    writer.write(example, encoder)
-
     try:
+        example = json.loads(example)
+        example[field] = get_random_id()
+
+        encoder = avro.io.BinaryEncoder(bytes_writer)
+
+        writer.write(example, encoder)
+
+        start_time = time.time()
         publish.single(topic, bytes_writer.getvalue(), hostname=host, auth={'username': user, 'password': password})
         mzbench.notify(('success_requests', 'counter'), 1)
         
